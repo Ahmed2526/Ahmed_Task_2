@@ -22,7 +22,7 @@ namespace Ahmed_Task_2.Web.Models
         public int ReceiverId { get; set; }
         public InvoiceParty Receiver { get; set; }
 
-        public ICollection<InvoiceLine> Lines { get; set; }
+        public ICollection<InvoiceLine> Lines { get; set; } = new List<InvoiceLine>();
 
         public decimal NetAmount { get; set; }
         public decimal TotalAmount { get; set; }

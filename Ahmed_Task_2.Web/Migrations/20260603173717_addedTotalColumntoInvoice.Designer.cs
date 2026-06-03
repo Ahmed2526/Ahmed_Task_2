@@ -4,6 +4,7 @@ using Ahmed_Task_2.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ahmed_Task_2.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603173717_addedTotalColumntoInvoice")]
+    partial class addedTotalColumntoInvoice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,7 +40,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ActivityCodes", (string)null);
+                    b.ToTable("ActivityCodes");
 
                     b.HasData(
                         new
@@ -226,7 +229,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("Invoices", (string)null);
+                    b.ToTable("Invoices");
                 });
 
             modelBuilder.Entity("Ahmed_Task_2.Web.Models.InvoiceLine", b =>
@@ -291,7 +294,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasIndex("InvoiceId");
 
-                    b.ToTable("InvoiceLines", (string)null);
+                    b.ToTable("InvoiceLines");
                 });
 
             modelBuilder.Entity("Ahmed_Task_2.Web.Models.InvoiceParty", b =>
@@ -353,7 +356,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasIndex("RegistrationId");
 
-                    b.ToTable("InvoiceParties", (string)null);
+                    b.ToTable("InvoiceParties");
                 });
 
             modelBuilder.Entity("Ahmed_Task_2.Web.Models.InvoiceTax", b =>
@@ -389,7 +392,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasIndex("TaxTypeId");
 
-                    b.ToTable("InvoiceTaxes", (string)null);
+                    b.ToTable("InvoiceTaxes");
                 });
 
             modelBuilder.Entity("Ahmed_Task_2.Web.Models.TaxSubType", b =>
@@ -412,7 +415,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasIndex("TaxTypeId");
 
-                    b.ToTable("TaxSubTypes", (string)null);
+                    b.ToTable("TaxSubTypes");
 
                     b.HasData(
                         new
@@ -558,7 +561,7 @@ namespace Ahmed_Task_2.Web.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TaxTypes", (string)null);
+                    b.ToTable("TaxTypes");
 
                     b.HasData(
                         new

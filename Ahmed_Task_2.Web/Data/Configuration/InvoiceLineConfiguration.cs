@@ -46,6 +46,10 @@ namespace Ahmed_Task_2.Web.Data.Configuration
                    .HasPrecision(18, 5)
                    .IsRequired();
 
+            builder.Property(x => x.Total)
+                   .HasPrecision(18, 5)
+                   .IsRequired();
+
             builder.Property(x => x.UnitType)
                    .HasConversion<string>()
                    .HasMaxLength(50)

@@ -25,7 +25,8 @@ namespace Ahmed_Task_2.Web.Models
 
         public decimal TotalTaxableFees { get; set; }
         public decimal NetTotal { get; set; }
+        public decimal Total { get; set; }
 
-        public ICollection<InvoiceTax> Taxes { get; set; }
+        public ICollection<InvoiceTax> Taxes { get; set; } = new List<InvoiceTax>();
     }
 }
