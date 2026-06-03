@@ -28,7 +28,7 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="WizardForms" asp-action="Index">WizardForms</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Invoices" asp-action="Index">Invoices</a>
                         </li>
                     </ul>
                 </div>
@@ -39,6 +39,8 @@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
+
+        <partial name="_Modal" />
     </div>
 
     <footer class="border-top footer text-muted">

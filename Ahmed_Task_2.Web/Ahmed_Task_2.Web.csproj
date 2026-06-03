@@ -19,10 +19,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="IService\" />
-    <Folder Include="Serivce\" />
-    <Folder Include="ViewModels\" />
-  </ItemGroup>
-
 </Project>

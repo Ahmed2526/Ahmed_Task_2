@@ -10,5 +10,12 @@ namespace Ahmed_Task_2.Web.Data
         {
         }
 
+        public DbSet<Invoice> Invoices { get; set; }
+        public DbSet<ActivityCode> ActivityCodes { get; set; }
+        public DbSet<InvoiceParty> InvoiceParties { get; set; }
+        public DbSet<InvoiceLine> InvoiceLines { get; set; }
+        public DbSet<InvoiceTax> InvoiceTaxes { get; set; }
+        public DbSet<TaxType> TaxTypes { get; set; }
+        public DbSet<TaxSubType> TaxSubTypes { get; set; }
     }
 }

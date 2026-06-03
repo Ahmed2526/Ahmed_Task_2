@@ -1,4 +1,6 @@
 using Ahmed_Task_2.Web.Data;
+using Ahmed_Task_2.Web.IService;
+using Ahmed_Task_2.Web.Serivce;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ahmed_Task_2.Web
@@ -13,6 +15,10 @@ namespace Ahmed_Task_2.Web
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<Data.ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+            // Register application services
+            builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 
             var app = builder.Build();
 

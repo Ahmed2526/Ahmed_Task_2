@@ -1,0 +1,521 @@
+﻿@model InvoiceVM
+
+@{
+    ViewData["Title"] = "Create Invoice";
+}
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div id="smartwizard">
+
+        <ul class="nav">
+            <li>
+                <a class="nav-link" href="#step-1">
+                    Step 1
+                    <br />
+                    <small>Essential Information</small>
+                </a>
+            </li>
+
+            <li>
+                <a class="nav-link" href="#step-2">
+                    Step 2
+                    <br />
+                    <small>Issuer/Receiver</small>
+                </a>
+            </li>
+
+            <li>
+                <a class="nav-link" href="#step-3">
+                    Step 3
+                    <br />
+                    <small>Invoice Lines</small>
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <!-- STEP 1 -->
+
+            <div id="step-1" class="tab-pane">
+
+                <div class="mb-3">
+                    <label asp-for="DateIssued" class="form-label"></label>
+                    <input type="date" asp-for="DateIssued" class="form-control" />
+                    <span asp-validation-for="DateIssued" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="InternalId" class="form-label"></label>
+                    <input asp-for="InternalId" class="form-control" />
+                    <span asp-validation-for="InternalId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-5">
+                    <label asp-for="ActivityCode" class="form-label"></label>
+                    <select asp-for="ActivityCode"
+                            asp-items="Model?.ActivityCodeList"
+                            class="form-select">
+                        <option value="">-- Select Activity Code --</option>
+                    </select>
+                    <span asp-validation-for="ActivityCode" class="text-danger"></span>
+                </div>
+
+
+            </div>
+
+            <!-- STEP 2 -->
+
+            <div id="step-2" class="tab-pane">
+
+                <div class="row mb-5">
+                    <div class="col-md-5">
+                        <h3>Issuer</h3>
+                        <hr />
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.TypeId" class="form-label"></label>
+                            <select asp-for="Issuer.TypeId"
+                                    asp-items="Model?.Issuer.PartyTypesList"
+                                    class="form-select">
+                                <option value="">-- Select Type--</option>
+                            </select>
+                            <span asp-validation-for="Issuer.TypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.RegistrationId" class="form-label"></label>
+                            <input asp-for="Issuer.RegistrationId" class="form-control" />
+                            <span asp-validation-for="Issuer.RegistrationId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.Name" class="form-label"></label>
+                            <input asp-for="Issuer.Name" class="form-control" />
+                            <span asp-validation-for="Issuer.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.Country" class="form-label"></label>
+                            <input asp-for="Issuer.Country" class="form-control" />
+                            <span asp-validation-for="Issuer.Country" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.Governorate" class="form-label"></label>
+                            <input asp-for="Issuer.Governorate" class="form-control" />
+                            <span asp-validation-for="Issuer.Governorate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.RegionCity" class="form-label"></label>
+                            <input asp-for="Issuer.RegionCity" class="form-control" />
+                            <span asp-validation-for="Issuer.RegionCity" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.Street" class="form-label"></label>
+                            <input asp-for="Issuer.Street" class="form-control" />
+                            <span asp-validation-for="Issuer.Street" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Issuer.BuildingNumber" class="form-label"></label>
+                            <input asp-for="Issuer.BuildingNumber" class="form-control" />
+                            <span asp-validation-for="Issuer.BuildingNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-5">
+                            <label asp-for="Issuer.BranchId" class="form-label"></label>
+                            <input asp-for="Issuer.BranchId" class="form-control" />
+                            <span asp-validation-for="Issuer.BranchId" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                    <div class="col-md-2">
+                    </div>
+                    <div class="col-md-5">
+                        <h3>Receiver</h3>
+                        <hr />
+                        <div class="mb-3">
+                            <label asp-for="Receiver.TypeId" class="form-label"></label>
+                            <select asp-for="Receiver.TypeId"
+                                    asp-items="Model?.Receiver.PartyTypesList"
+                                    class="form-select">
+                                <option value="">-- Select Type--</option>
+                            </select>
+                            <span asp-validation-for="Receiver.TypeId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.RegistrationId" class="form-label"></label>
+                            <input asp-for="Receiver.RegistrationId" class="form-control" />
+                            <span asp-validation-for="Receiver.RegistrationId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.Name" class="form-label"></label>
+                            <input asp-for="Receiver.Name" class="form-control" />
+                            <span asp-validation-for="Receiver.Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.Country" class="form-label"></label>
+                            <input asp-for="Receiver.Country" class="form-control" />
+                            <span asp-validation-for="Receiver.Country" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.Governorate" class="form-label"></label>
+                            <input asp-for="Receiver.Governorate" class="form-control" />
+                            <span asp-validation-for="Receiver.Governorate" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.RegionCity" class="form-label"></label>
+                            <input asp-for="Receiver.RegionCity" class="form-control" />
+                            <span asp-validation-for="Receiver.RegionCity" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Receiver.Street" class="form-label"></label>
+                            <input asp-for="Receiver.Street" class="form-control" />
+                            <span asp-validation-for="Receiver.Street" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-5">
+                            <label asp-for="Receiver.BuildingNumber" class="form-label"></label>
+                            <input asp-for="Receiver.BuildingNumber" class="form-control" />
+                            <span asp-validation-for="Receiver.BuildingNumber" class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- STEP 3 -->
+
+            <div id="step-3" class="tab-pane">
+
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <h3>Lines</h3>
+                    <a href="#" onclick="showLineModal()" class="btn btn-primary">Add Line </a>
+                </div>
+                <hr />
+
+                <table class="table my-5">
+                    <thead>
+                        <tr>
+                            <th scope="col">Item Code</th>
+                            <th scope="col">Unit type</th>
+                            <th scope="col">Quantity</th>
+                            <th scope="col">Currency Sold</th>
+                            <th scope="col">Amount EGP</th>
+                            <th scope="col">Sales Total</th>
+                            <th scope="col">Items Discount</th>
+                            <th scope="col">Discount Amount</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="invoiceLinesBody">
+                    </tbody>
+                </table>
+
+                <button type="submit"
+                        class="btn btn-primary my-5">
+                    Save Invoice
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal" id="LineModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Line</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <partial name="_InvoiceLinePartial" model="new InvoiceLineVM()" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" onclick="addLine()" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="HiddenLinesContainer"></div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        $(function () {
+
+            $('#smartwizard').smartWizard({
+
+                selected: 0,
+
+                theme: 'arrows',
+
+                autoAdjustHeight: true,
+
+                enableUrlHash: false,
+
+                keyboard: true,
+
+                transition: {
+                    animation: 'slideHorizontal'
+                }
+
+            });
+
+        });
+
+        $('#smartwizard').on(
+        "leaveStep",
+        function(e, anchorObject, currentStepIndex, nextStepIndex, stepDirection)
+        {
+        if(stepDirection === 'forward')
+        {
+        return validateCurrentStep(currentStepIndex);
+        }
+
+        return true;
+        });
+
+        function validateCurrentStep(step)
+        {
+            let valid = true;
+
+            let currentTab =
+                $('#step-' + (step + 1));
+
+            currentTab
+                .find('input,textarea')
+                .each(function ()
+                {
+                    $(this).valid();
+
+                    if (!$(this).valid())
+                    {
+                        valid = false;
+                    }
+                });
+
+            return valid;
+        }
+
+        const lineModal = new bootstrap.Modal(document.getElementById('LineModal'));
+
+
+        function showLineModal() {
+          lineModal.show();
+        }
+
+         let lineIndex = 0;
+
+        let invoiceLines = [];
+        let currentTaxes = [];
+
+        function addTaxRow()
+        {
+            let taxType = $("#TaxType").val();
+            let subType = $("#SubType").val();
+            let rate = $("#Rate").val();
+            let amount = $("#Amount").val();
+
+            if (!taxType)
+            {
+                alert("Tax Type is required");
+                return;
+            }
+
+            let tax =
+            {
+                taxType: taxType,
+                subType: subType,
+                rate: rate,
+                amount: amount
+            };
+
+            currentTaxes.push(tax);
+
+            renderTaxTable();
+
+            $("#TaxType").val('');
+            $("#SubType").val('');
+            $("#Rate").val('');
+            $("#Amount").val('');
+        }
+
+        function renderTaxTable()
+        {
+            let body = $("#taxTableBody");
+
+            body.empty();
+
+            currentTaxes.forEach((tax, index) =>
+            {
+                body.append(`
+                    <tr>
+                        <td>${tax.taxType}</td>
+                        <td>${tax.rate}</td>
+                        <td>${tax.amount}</td>
+                        <td>${tax.subType}</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="removeTax(${index})">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function removeTax(index)
+        {
+            currentTaxes.splice(index, 1);
+
+            renderTaxTable();
+        }
+
+        function addLine()
+        {
+        let valid = true;
+
+        $("#LineModal")
+            .find("input, textarea, select")
+            .each(function ()
+            {
+                if ($(this).data("val") !== undefined)
+                {
+                    $(this).valid();
+
+                    if (!$(this).valid())
+                    {
+                        valid = false;
+                    }
+                }
+            });
+
+        if (!valid)
+        {
+            return;
+        }
+
+            let line =
+            {
+                itemCode: $("#ItemCode").val(),
+                description: $("#Description").val(),
+                quantity: $("#Quantity").val(),
+                unitType: $("#UnitType").val(),
+                unitPrice: $("#UnitPrice").val(),
+                salesTotal: $("#SalesTotal").val(),
+                discountPerUnit: $("#DiscountPerUnit").val(),
+                discountPercentage: $("#DiscountPercentage").val(),
+                taxes: [...currentTaxes]
+            };
+
+            invoiceLines.push(line);
+
+            currentTaxes = [];
+
+            renderTaxTable();
+            renderLinesTable();
+
+            clearLineForm();
+
+            lineModal.hide();
+        }
+
+        function renderLinesTable()
+        {
+            let body = $("#invoiceLinesBody");
+
+            body.empty();
+
+            invoiceLines.forEach((line, index) =>
+            {
+                body.append(`
+                    <tr>
+                        <td>${line.itemCode}</td>
+                        <td>${line.unitType}</td>
+                        <td>${line.quantity}</td>
+                        <td>${line.unitPrice}</td>
+                        <td>${line.salesTotal}</td>
+                        <td>${line.discountPerUnit}</td>
+                        <td>${line.discountPercentage}</td>
+                        <td>${line.taxes.length}</td>
+                        <td>
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="removeLine(${index})">
+                                Delete
+                            </button>
+                        </td>
+                    </tr>
+                `);
+            });
+        }
+
+        function removeLine(index)
+        {
+            invoiceLines.splice(index, 1);
+
+            renderLinesTable();
+        }
+
+        function clearLineForm()
+        {
+            $("#ItemCode").val('');
+            $("#Description").val('');
+            $("#Quantity").val('');
+            $("#UnitType").val('');
+            $("#UnitPrice").val('');
+            $("#SalesTotal").val('');
+            $("#DiscountPerUnit").val('');
+            $("#DiscountPercentage").val('');
+        }
+
+        $("form").submit(function ()
+        {
+            let container = $("#HiddenLinesContainer");
+
+            container.empty();
+
+            invoiceLines.forEach((line, lineIndex) =>
+            {
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemCode" value="${line.itemCode}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].Description" value="${line.description}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].Quantity" value="${line.quantity}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitType" value="${line.unitType}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitPrice" value="${line.unitPrice}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].SalesTotal" value="${line.salesTotal}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPerUnit" value="${line.discountPerUnit}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPercentage" value="${line.discountPercentage}" />`);
+
+                line.taxes.forEach((tax, taxIndex) =>
+                {
+                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxType}" />`);
+                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].SubType" value="${tax.subType}" />`);
+                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
+                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);
+                });
+            });
+        });
+
+    </script>
+
+}
