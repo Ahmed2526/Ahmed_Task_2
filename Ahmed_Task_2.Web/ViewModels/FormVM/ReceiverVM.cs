@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Ahmed_Task_2.Web.ViewModels
+namespace Ahmed_Task_2.Web.ViewModels.FormVM
 {
-    public class IssuerVM
+    public class ReceiverVM
     {
         public string Type { get; set; }
         public string RegistrationId { get; set; }
@@ -12,6 +12,5 @@ namespace Ahmed_Task_2.Web.ViewModels
         public string RegionCity { get; set; }
         public string Street { get; set; }
         public string BuildingNumber { get; set; }
-        public string BranchId { get; set; }
     }
 }

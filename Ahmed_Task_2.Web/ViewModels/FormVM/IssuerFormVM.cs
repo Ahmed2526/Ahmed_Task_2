@@ -1,10 +1,9 @@
 ﻿using Ahmed_Task_2.Web.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Ahmed_Task_2.Web.ViewModels
+namespace Ahmed_Task_2.Web.ViewModels.FormVM
 {
-    public class ReceiverVM
+    public class IssuerFormVM
     {
         public int TypeId { get; set; }
         public List<SelectListItem>? PartyTypesList { get; set; }
@@ -23,5 +22,6 @@ namespace Ahmed_Task_2.Web.ViewModels
 
         public string BuildingNumber { get; set; }
 
+        public string BranchId { get; set; }
     }
 }

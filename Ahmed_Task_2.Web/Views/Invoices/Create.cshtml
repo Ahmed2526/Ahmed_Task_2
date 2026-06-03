@@ -1,4 +1,4 @@
-﻿@model InvoiceVM
+﻿@model InvoiceFormVM
 
 @{
     ViewData["Title"] = "Create Invoice";
@@ -241,7 +241,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <partial name="_InvoiceLinePartial" model="new InvoiceLineVM()" />
+                    <partial name="_InvoiceLinePartial" model="new InvoiceLineFormVM()" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

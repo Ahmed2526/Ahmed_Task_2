@@ -1,0 +1,235 @@
+﻿@model InvoiceVM
+
+@{
+    ViewData["Title"] = "Invoice";
+}
+
+<div class="container my-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header text-center">
+            <h2>Invoice v1.0</h2>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Header -->
+            <div class="row mb-4">
+
+                <div class="col-md-3">
+                    <strong>Internal Id</strong><br />
+                    @Model.InternalId
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Date Issued</strong><br />
+                    @Model.DateIssued
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Activity Code</strong><br />
+                    @Model.ActivityCode
+                </div>
+
+                <div class="col-md-3">
+                    <strong>Total Amount</strong><br />
+                    @Model.TotalAmount.ToString("N5")
+                </div>
+
+            </div>
+
+            <!-- Parties -->
+            <div class="row mb-5">
+
+                <div class="col-md-6">
+
+                    <div class="card h-100">
+                        <div class="card-header text-center">
+                            <h4>Issuer</h4>
+                        </div>
+
+                        <div class="card-body">
+
+                            <p><strong>Type:</strong> @Model.Issuer.Type</p>
+
+                            <p><strong>ID:</strong> @Model.Issuer.RegistrationId</p>
+
+                            <p><strong>Name:</strong> @Model.Issuer.Name</p>
+
+                            <p><strong>Country:</strong> @Model.Issuer.Country</p>
+
+                            <p><strong>Governorate:</strong> @Model.Issuer.Governorate</p>
+
+                            <p><strong>City:</strong> @Model.Issuer.RegionCity</p>
+
+                            <p><strong>Street:</strong> @Model.Issuer.Street</p>
+
+                            <p><strong>Building:</strong> @Model.Issuer.BuildingNumber</p>
+
+                            <p><strong>Branch:</strong> @Model.Issuer.BranchId</p>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+
+                    <div class="card h-100">
+                        <div class="card-header text-center">
+                            <h4>Receiver</h4>
+                        </div>
+
+                        <div class="card-body">
+
+                            <p><strong>Type:</strong> @Model.Receiver.Type</p>
+
+                            <p><strong>ID:</strong> @Model.Receiver.RegistrationId</p>
+
+                            <p><strong>Name:</strong> @Model.Receiver.Name</p>
+
+                            <p><strong>Country:</strong> @Model.Receiver.Country</p>
+
+                            <p><strong>Governorate:</strong> @Model.Receiver.Governorate</p>
+
+                            <p><strong>City:</strong> @Model.Receiver.RegionCity</p>
+
+                            <p><strong>Street:</strong> @Model.Receiver.Street</p>
+
+                            <p><strong>Building:</strong> @Model.Receiver.BuildingNumber</p>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Lines -->
+            <h3 class="mb-3">Invoice Lines</h3>
+
+            @foreach (var line in Model.Lines)
+            {
+                <div class="card mb-4">
+
+                    <div class="card-header">
+                        <strong>@line.Description</strong>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+
+                                <table class="table table-borderless">
+
+                                    <tr>
+                                        <th>Item Code</th>
+                                        <td>@line.ItemCode</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Quantity</th>
+                                        <td>@line.Quantity.ToString("N5")</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Unit Type</th>
+                                        <td>@line.UnitType</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Unit Price</th>
+                                        <td>@line.UnitPrice.ToString("N5")</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Sales Total</th>
+                                        <td>@line.SalesTotal.ToString("N5")</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Discount Per Unit</th>
+                                        <td>@line.DiscountPerUnit.ToString("N5")</td>
+                                    </tr>
+
+                                    <tr>
+                                        <th>Discount %</th>
+                                        <td>@line.DiscountPercentage.ToString("N5")</td>
+                                    </tr>
+
+                                </table>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <h5>Taxes</h5>
+
+                                <table class="table table-sm table-striped">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Sub Type</th>
+                                            <th>Rate</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @foreach (var tax in line.Taxes)
+                                        {
+                                            <tr>
+                                                <td>@tax.TaxType</td>
+                                                <td>@tax.TaxSubType</td>
+                                                <td>@tax.Rate.ToString("N5")</td>
+                                                <td>@tax.Amount.ToString("N5")</td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+            <!-- Totals -->
+
+            <div class="row justify-content-end">
+
+                <div class="col-md-4">
+
+                    <table class="table">
+
+                        <tr>
+                            <th>Net Amount</th>
+                            <td>@Model.NetAmount.ToString("N5")</td>
+                        </tr>
+
+                        <tr>
+                            <th>Total Amount</th>
+                            <td>@Model.TotalAmount.ToString("N5")</td>
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
