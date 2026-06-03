@@ -1,4 +1,6 @@
-﻿namespace Ahmed_Task_2.Web.Models
+﻿using Ahmed_Task_2.Web.@enum;
+
+namespace Ahmed_Task_2.Web.Models
 {
     public class InvoiceLine
     {

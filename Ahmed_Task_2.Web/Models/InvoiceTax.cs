@@ -6,7 +6,11 @@ namespace Ahmed_Task_2.Web.Models
     public class InvoiceTax
     {
         public int Id { get; set; }
+
+
+        [ForeignKey(nameof(InvoiceLine))]
         public int InvoiceLineId { get; set; }
+        public InvoiceLine InvoiceLine { get; set; }
 
 
         [ForeignKey(nameof(TaxType))]

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.Eventing.Reader;
+﻿using Ahmed_Task_2.Web.@enum;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Ahmed_Task_2.Web.Models
 {
