@@ -13,13 +13,13 @@ namespace Ahmed_Task_2.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
             builder.Services.AddDbContext<Data.ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
             // Register application services
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
+
 
 
             builder.Services.AddEndpointsApiExplorer();
@@ -44,13 +44,11 @@ namespace Ahmed_Task_2.Web
             app.UseHttpsRedirection();
             app.UseRouting();
 
-
             app.UseAuthorization();
 
             app.MapControllers();
 
             app.MapStaticAssets();
-
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

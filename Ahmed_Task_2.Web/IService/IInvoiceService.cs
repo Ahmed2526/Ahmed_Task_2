@@ -7,5 +7,6 @@ namespace Ahmed_Task_2.Web.IService
     public interface IInvoiceService
     {
         Task<Result<bool>> CreateInvoiceAsync(InvoiceRequest request);
+        Task<Result<InvoiceVM>> GetByIdAsync(string InternalId);
     }
 }

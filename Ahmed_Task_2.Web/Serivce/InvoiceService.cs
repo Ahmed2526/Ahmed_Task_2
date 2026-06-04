@@ -4,6 +4,7 @@ using Ahmed_Task_2.Web.@enum;
 using Ahmed_Task_2.Web.IService;
 using Ahmed_Task_2.Web.Models;
 using Ahmed_Task_2.Web.ViewModels;
+using Ahmed_Task_2.Web.ViewModels.FormVM;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ahmed_Task_2.Web.Serivce
@@ -115,6 +116,69 @@ namespace Ahmed_Task_2.Web.Serivce
             await _context.SaveChangesAsync();
 
             return Result<bool>.Success(StatusCodes.Status200OK, true);
+        }
+
+        public async Task<Result<InvoiceVM>> GetByIdAsync(string InternalId)
+        {
+            var invoiceVM = await _context.Invoices
+                .Where(i => i.InternalId == InternalId)
+                .Select(i => new InvoiceVM
+                {
+                    InternalId = i.InternalId,
+                    ActivityCode = i.ActivityCode.Id,
+                    DateIssued = i.DateIssued,
+                    NetAmount = i.NetAmount,
+                    TotalAmount = i.TotalAmount,
+                    Issuer = new IssuerVM
+                    {
+                        Type = i.Issuer.Type.ToString(),
+                        RegistrationId = i.Issuer.RegistrationId,
+                        Name = i.Issuer.Name,
+                        Country = i.Issuer.Country,
+                        Governorate = i.Issuer.Governorate,
+                        RegionCity = i.Issuer.RegionCity,
+                        Street = i.Issuer.Street,
+                        BuildingNumber = i.Issuer.BuildingNumber,
+                        BranchId = i.Issuer.BranchId ?? "",
+                    },
+                    Receiver = new ReceiverVM
+                    {
+                        Type = i.Receiver.Type.ToString(),
+                        RegistrationId = i.Receiver.RegistrationId,
+                        Name = i.Receiver.Name,
+                        Country = i.Receiver.Country,
+                        Governorate = i.Receiver.Governorate,
+                        RegionCity = i.Receiver.RegionCity,
+                        Street = i.Receiver.Street,
+                        BuildingNumber = i.Receiver.BuildingNumber
+                    },
+                    Lines = i.Lines.Select(l => new InvoiceLineVM
+                    {
+                        ItemCode = l.ItemCode,
+                        Description = l.Description,
+                        Quantity = l.Quantity,
+                        UnitType = l.UnitType.ToString(),
+                        UnitPrice = l.UnitPrice,
+                        SalesTotal = l.SalesTotal,
+                        DiscountPercentage = l.DiscountPercentage,
+                        DiscountPerUnit = l.DiscountPerUnit,
+
+                        Taxes = l.Taxes.Select(t => new InvoiceTaxVM
+                        {
+                            TaxType = t.TaxType.Name,
+                            TaxSubType = t.TaxSubType.Name,
+                            Amount = t.Amount,
+                            Rate = t.Rate,
+                        }).ToList()
+                    }).ToList()
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (invoiceVM is null)
+                return Result<InvoiceVM>.Fail(StatusCodes.Status404NotFound, new[] { "Invoice not found" });
+
+            return Result<InvoiceVM>.Success(StatusCodes.Status200OK, invoiceVM);
         }
 
         private decimal CalculateNetTotal(InvoiceLineRequest LineRequest)

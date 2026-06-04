@@ -7,11 +7,11 @@ namespace Ahmed_Task_2.Web.API
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InvoicesController : ControllerBase
+    public class InvoiceController : ControllerBase
     {
         private readonly IInvoiceService _invoiceService;
 
-        public InvoicesController(IInvoiceService invoiceService)
+        public InvoiceController(IInvoiceService invoiceService)
         {
             _invoiceService = invoiceService;
         }
