@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ahmed_Task_2.Web.ViewModels.FormVM
@@ -10,16 +11,17 @@ namespace Ahmed_Task_2.Web.ViewModels.FormVM
 
         //handle validation for internal id to be unique in the database
         [Display(Name = "Internal Id")]
+        [Remote(action: "IsInternalIdUnique", controller: "Invoices", ErrorMessage = "Invoice with this id already exists")]
         public string InternalId { get; set; }
 
         //Seed Data for Activity Codes
-        [Display(Name = "Activity Code")]   
+        [Display(Name = "Activity Code")]
         public int ActivityCode { get; set; }
-        public List<SelectListItem>? ActivityCodeList { get; set; }
+        public List<SelectListItem>? ActivityCodeList { get; set; } = new();
 
-        public IssuerFormVM Issuer { get; set; }
-        public ReceiverFormVM Receiver { get; set; }
+        public IssuerFormVM Issuer { get; set; } = new();
+        public ReceiverFormVM Receiver { get; set; } = new();
 
-        public List<InvoiceLineFormVM> Lines { get; set; }
+        public List<InvoiceLineFormVM> Lines { get; set; } = new();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Ahmed_Task_2.Web.@enum;
+﻿using Ahmed_Task_2.Web.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.Eventing.Reader;
 

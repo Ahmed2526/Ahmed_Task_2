@@ -1,7 +1,10 @@
-﻿using Ahmed_Task_2.Web.Data;
+﻿using System;
+using Ahmed_Task_2.Web.Data;
+using Ahmed_Task_2.Web.Enums;
 using Ahmed_Task_2.Web.IService;
 using Ahmed_Task_2.Web.ViewModels.FormVM;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Ahmed_Task_2.Web.Controllers
 {
@@ -32,20 +35,68 @@ namespace Ahmed_Task_2.Web.Controllers
 
             return View(invoiceVM.Data);
         }
-       
+
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            var model = new InvoiceFormVM();
+            model = PopulateSelectLists(model);
+
+            return View(model);
         }
 
         [HttpPost]
-        public IActionResult Create(InvoiceFormVM model)
+        public async Task<IActionResult> Create(InvoiceFormVM model)
         {
-            var invoice = model;
+            if (!ModelState.IsValid)
+            {
+                model = PopulateSelectLists(model);
 
-            return View();
+                return View(model);
+            }
+
+            var result = await _invoiceService.CreateInvoiceMVCAsync(model);
+
+            if (!result.IsSuccess)
+            {
+                foreach (var error in result.Errors!)
+                    ModelState.AddModelError("", error);
+
+                model = PopulateSelectLists(model);
+                return View(model);
+            }
+
+            return RedirectToAction("Details", new { id = result.Data });
+        }
+
+        private InvoiceFormVM PopulateSelectLists(InvoiceFormVM model)
+        {
+            model.DateIssued = DateOnly.FromDateTime(DateTime.Now);
+
+            model.ActivityCodeList = _context.ActivityCodes.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name
+            }).ToList();
+            model.Issuer.PartyTypesList = Enum.GetValues<PartyType>().Select(p => new SelectListItem
+            {
+                Value = ((int)p).ToString(),
+                Text = p.ToString()
+            }).ToList();
+            model.Receiver.PartyTypesList = Enum.GetValues<PartyType>().Select(p => new SelectListItem
+            {
+                Value = ((int)p).ToString(),
+                Text = p.ToString()
+            }).ToList();
+
+            return model;
+        }
+
+        public JsonResult IsInternalIdUnique(string internalId)
+        {
+            var isUnique = !_context.Invoices.Any(i => i.InternalId == internalId);
+            return Json(isUnique);
         }
     }
 }

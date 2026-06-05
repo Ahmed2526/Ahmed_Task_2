@@ -1,4 +1,6 @@
-﻿@model InvoiceLineFormVM
+﻿@using Ahmed_Task_2.Web.Data
+@model InvoiceLineFormVM
+@inject ApplicationDbContext _context
 
 <div class="row">
     <div class="col-md-5">
@@ -16,86 +18,103 @@
         </div>
 
         <div class="d-flex justify-content-around">
-        <div class="mb-3">
-            <label asp-for="Quantity" class="form-label"></label>
-            <input asp-for="Quantity" class="form-control" />
-            <span asp-validation-for="Quantity" class="text-danger"></span>
-        </div>
-        @* <div class="mb-3">
-            <label asp-for="UnitType" class="form-label"></label>
-            <input asp-for="UnitType" class="form-control" />
-            <span asp-validation-for="UnitType" class="text-danger"></span>
-        </div> *@
+            <div class="mb-3 me-2">
+                <label asp-for="Quantity" class="form-label"></label>
+                <input asp-for="Quantity" class="form-control" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="UnitTypeId" class="form-label"></label>
+                <select asp-for="UnitTypeId" asp-items="Model?.UnitTypesList" class="form-select">
+                    <option value="">-- Select Unit Type --</option>
+                </select>
+                <span asp-validation-for="UnitTypeId" class="text-danger"></span>
+            </div>
         </div>
 
         <h4>Price info</h4>
         <hr />
         <div class="mb-3">
             <label asp-for="UnitPrice" class="form-label"></label>
-            <input asp-for="UnitPrice" class="form-control" />
+            <div class="input-group">
+                <input asp-for="UnitPrice" class="form-control" onchange="calcSalesTotal()" />
+                <span class="input-group-text">EGP</span>
+            </div>
             <span asp-validation-for="UnitPrice" class="text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="SalesTotal" class="form-label"></label>
-            <input asp-for="SalesTotal" class="form-control" />
-            <span asp-validation-for="SalesTotal" class="text-danger"></span>
+            <label for="Sales total" class="form-label">Sales total</label>
+            <div class="input-group">
+                <input id="SalesTotal" name="Sales total" value="0.00" class="form-control" disabled />
+                <span class="input-group-text">EGP</span>
+            </div>
         </div>
 
         <h4>Discount info</h4>
-        <hr />  
+        <hr />
         <div class="mb-3">
             <label asp-for="DiscountPerUnit" class="form-label"></label>
-            <input asp-for="DiscountPerUnit" class="form-control" />
+            <div class="input-group">
+                <input asp-for="DiscountPerUnit" onchange="calcTotalDiscount()" class="form-control" />
+                <span class="input-group-text">EGP</span>
+            </div>
             <span asp-validation-for="DiscountPerUnit" class="text-danger"></span>
         </div>
+
+        <div class="mb-3">
+            <label for="items discount" class="form-label">items discount</label>
+            <div class="input-group">
+                <input id="ItemsDiscount" name="items discount" value="0.00" class="form-control" disabled />
+                <span class="input-group-text">EGP</span>
+            </div>
+        </div>
+        <hr />
         <div class="mb-3">
             <label asp-for="DiscountPercentage" class="form-label"></label>
-            <input asp-for="DiscountPercentage" class="form-control" />
+            <div class="input-group">
+                <input asp-for="DiscountPercentage" onchange="calcDiscountAmount()" class="form-control" />
+                <span class="input-group-text">%</span>
+            </div>
             <span asp-validation-for="DiscountPercentage" class="text-danger"></span>
-        </div>     
+        </div>
+
+        <div class="mb-3">
+            <label for="discount amount" class="form-label">discount amount</label>
+            <div class="input-group">
+                <input name="discount amount" id="DiscountAmount" value="0.00" class="form-control" disabled />
+                <span class="input-group-text">EGP</span>
+            </div>
+        </div>
+
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-5">
         <div class="d-flex justify-content-between">
-        <h4>Taxes</h4>
+            <h4>Taxes</h4>
             <button type="button" class="btn btn-primary" onclick="addTaxRow()" id="addTaxBtn">Add Tax</button>
         </div>
         <hr />
 
-        <div class="row mb-3">
+        <partial name="_TaxLinePartial"
+                 model='new InvoiceTaxFormVM
+                 {
+                     TaxTypesList = _context.TaxTypes
+                        .Select(x => new SelectListItem
+                        {
+                            Value = x.Id.ToString(),
+                            Text = x.Name
+                        }).ToList(),
 
-            <div class="col-md-3">
-                <label class="form-label">Tax Type</label>
-                <input id="TaxType"
-                       class="form-control" />
-            </div>
+                     TaxSubTypeList = _context.TaxSubTypes
+                        .Select(x => new SelectListItem
+                        {
+                            Value = x.Id.ToString(),
+                            Text = x.Name
+                        }).ToList()
+                 }' />
 
-            <div class="col-md-3">
-                <label class="form-label">Sub Type</label>
-                <input id="SubType"
-                       class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Rate</label>
-                <input id="Rate"
-                       type="number"
-                       step="0.01"
-                       class="form-control" />
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Amount</label>
-                <input id="Amount"
-                       type="number"
-                       step="0.01"
-                       class="form-control" />
-            </div>
-
-        </div>
-
-        @* Tax table  *@
-        <table class="table my-5">
+@* Tax table  *@
+<table class="table my-5">
             <thead>
                 <tr>
                     <th scope="col">TaxType</th>
@@ -109,12 +128,12 @@
                 </tr>
             </tbody>
         </table>
-        
+
         <h4>Totals</h4>
-        <hr />  
+        <hr />
         <div class="mb-3">
             <label class="form-label">Total Taxable Fees</label>
-            <input type="number" id="TotalTaxableFees" class="form-control" disabled/>
+            <input type="number" id="TotalTaxableFees" class="form-control" disabled />
         </div>
         <div class="mb-3">
             <label class="form-label">Net total</label>

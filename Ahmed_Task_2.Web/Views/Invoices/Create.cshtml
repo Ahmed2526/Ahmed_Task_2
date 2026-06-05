@@ -211,11 +211,11 @@
                             <th scope="col">Item Code</th>
                             <th scope="col">Unit type</th>
                             <th scope="col">Quantity</th>
-                            <th scope="col">Currency Sold</th>
-                            <th scope="col">Amount EGP</th>
+                            <th scope="col">Unit Price</th>
                             <th scope="col">Sales Total</th>
                             <th scope="col">Items Discount</th>
                             <th scope="col">Discount Amount</th>
+                            <th scope="col">Total</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
@@ -223,11 +223,12 @@
                     </tbody>
                 </table>
 
-                <button type="submit"
+           <button type="submit"
                         class="btn btn-primary my-5">
                     Save Invoice
                 </button>
 
+                <div class="mb-5"></div>
             </div>
 
         </div>
@@ -241,7 +242,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <partial name="_InvoiceLinePartial" model="new InvoiceLineFormVM()" />
+                    <partial name="_InvoiceLinePartial" model="new InvoiceLineFormVM() { UnitTypesList = Enum.GetValues<UnitType>().Select(u => new SelectListItem { Value = ((int)u).ToString(), Text = u.ToString() }).ToList() }" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -301,7 +302,7 @@
                 $('#step-' + (step + 1));
 
             currentTab
-                .find('input,textarea')
+                .find('input, textarea, select')
                 .each(function ()
                 {
                     $(this).valid();
@@ -317,6 +318,80 @@
 
         const lineModal = new bootstrap.Modal(document.getElementById('LineModal'));
 
+        function calcTotalDiscount() {
+            let quantity = parseFloat($("#Quantity").val() || 0);
+            let discountPerUnit = parseFloat($("#DiscountPerUnit").val() || 0);
+
+            let totalDiscount = quantity * discountPerUnit;
+
+            $("#ItemsDiscount").val(totalDiscount.toFixed(5));
+
+            updateTotals();
+        }
+
+        function calcSalesTotal() {
+            let quantity = parseFloat($("#Quantity").val() || 0);
+            let unitPrice = parseFloat($("#UnitPrice").val() || 0);
+
+            let salesTotal = quantity * unitPrice;
+
+            $("#SalesTotal").val(salesTotal.toFixed(5));
+
+            updateTotals();
+        }
+
+        function calcDiscountAmount() {
+
+            let quantity = parseFloat($("#Quantity").val() || 0);
+            let unitPrice = parseFloat($("#UnitPrice").val() || 0);
+            let discountRate = parseFloat($("#DiscountPercentage").val() || 0);
+
+            let salesTotal = quantity * unitPrice;
+
+            let discountAmount =
+                salesTotal * (discountRate / 100);
+
+            $("#DiscountAmount").val(discountAmount.toFixed(5));
+
+            updateTotals();
+        }
+
+        function updateTotals()
+        {
+            let salesTotal =
+                parseFloat($("#SalesTotal").val() || 0);
+
+            let itemsDiscount =
+                parseFloat($("#ItemsDiscount").val() || 0);
+
+            let discountAmount =
+                parseFloat($("#DiscountAmount").val() || 0);
+
+            let totalTaxableFees =
+                currentTaxes.reduce(
+                    (sum, tax) => sum + parseFloat(tax.amount || 0),
+                    0);
+
+            let netTotal =
+                salesTotal -
+                itemsDiscount -
+                discountAmount;
+
+            let total =
+                netTotal +
+                totalTaxableFees;
+
+            $("#TotalTaxableFees")
+                .val(totalTaxableFees.toFixed(5));
+
+            $("#NetTotal")
+                .val(netTotal.toFixed(5));
+
+            $("#Total")
+                .val(total.toFixed(5));
+        }
+
+
 
         function showLineModal() {
           lineModal.show();
@@ -330,20 +405,39 @@
         function addTaxRow()
         {
             let taxType = $("#TaxType").val();
-            let subType = $("#SubType").val();
+            let taxSubType = $("#TaxSubType").val();
             let rate = $("#Rate").val();
             let amount = $("#Amount").val();
 
-            if (!taxType)
+            if (taxType)
             {
-                alert("Tax Type is required");
-                return;
+                if (!taxSubType)
+                {
+                    alert("Please select a Tax Sub Type.");
+                    return;
+                }
+
+                if (!amount)
+                {
+                    alert("Please enter the Tax Amount.");
+                    return;
+                }
+
+                if (!rate)
+                {
+                    alert("Please enter the Tax Rate.");
+                    return;
+                }
             }
 
             let tax =
             {
-                taxType: taxType,
-                subType: subType,
+                taxTypeId: taxType,
+                taxTypeName: $("#TaxType option:selected").text(),
+
+                taxSubTypeId: taxSubType,
+                taxSubTypeName: $("#TaxSubType option:selected").text(),
+
                 rate: rate,
                 amount: amount
             };
@@ -353,9 +447,11 @@
             renderTaxTable();
 
             $("#TaxType").val('');
-            $("#SubType").val('');
+            $("#TaxSubType").val('');
             $("#Rate").val('');
             $("#Amount").val('');
+
+            updateTotals();
         }
 
         function renderTaxTable()
@@ -368,10 +464,10 @@
             {
                 body.append(`
                     <tr>
-                        <td>${tax.taxType}</td>
+                        <td>${tax.taxTypeName}</td>
+                        <td>${tax.taxSubTypeName}</td>
                         <td>${tax.rate}</td>
                         <td>${tax.amount}</td>
-                        <td>${tax.subType}</td>
                         <td>
                             <button type="button"
                                     class="btn btn-danger btn-sm"
@@ -389,6 +485,7 @@
             currentTaxes.splice(index, 1);
 
             renderTaxTable();
+            updateTotals();
         }
 
         function addLine()
@@ -415,18 +512,46 @@
             return;
         }
 
-            let line =
-            {
-                itemCode: $("#ItemCode").val(),
-                description: $("#Description").val(),
-                quantity: $("#Quantity").val(),
-                unitType: $("#UnitType").val(),
-                unitPrice: $("#UnitPrice").val(),
-                salesTotal: $("#SalesTotal").val(),
-                discountPerUnit: $("#DiscountPerUnit").val(),
-                discountPercentage: $("#DiscountPercentage").val(),
-                taxes: [...currentTaxes]
-            };
+                let totalTax =
+            currentTaxes.reduce(
+                (sum, tax) => sum + parseFloat(tax.amount || 0),
+                0);
+
+        let netTotal =
+            parseFloat($("#SalesTotal").val() || 0)
+            - parseFloat($("#ItemsDiscount").val() || 0)
+            - parseFloat($("#DiscountAmount").val() || 0);
+
+        let total =
+            netTotal + totalTax;
+
+        let line =
+        {
+            itemCode: $("#ItemCode").val(),
+            description: $("#Description").val(),
+
+            quantity: $("#Quantity").val(),
+
+            unitTypeId: $("#UnitTypeId").val(),
+            unitType: $("#UnitTypeId option:selected").text(),
+
+            unitPrice: $("#UnitPrice").val(),
+
+            salesTotal: $("#SalesTotal").val(),
+
+            discountPerUnit: $("#DiscountPerUnit").val(),
+
+            itemsDiscount: $("#ItemsDiscount").val(),
+
+            discountPercentage: $("#DiscountPercentage").val(),
+
+            discountAmount: $("#DiscountAmount").val(),
+
+            totalTaxableFees: totalTax,
+            total: total,
+
+            taxes: [...currentTaxes]
+        };
 
             invoiceLines.push(line);
 
@@ -455,9 +580,9 @@
                         <td>${line.quantity}</td>
                         <td>${line.unitPrice}</td>
                         <td>${line.salesTotal}</td>
-                        <td>${line.discountPerUnit}</td>
-                        <td>${line.discountPercentage}</td>
-                        <td>${line.taxes.length}</td>
+                        <td>${line.itemsDiscount}</td>
+                        <td>${line.discountAmount}</td>
+                        <td>${parseFloat(line.total).toFixed(5)}</td>
                         <td>
                             <button type="button"
                                     class="btn btn-danger btn-sm"
@@ -481,40 +606,65 @@
         {
             $("#ItemCode").val('');
             $("#Description").val('');
+
             $("#Quantity").val('');
-            $("#UnitType").val('');
+
+            $("#UnitTypeId").val('');
+
             $("#UnitPrice").val('');
-            $("#SalesTotal").val('');
+
+            $("#SalesTotal").val('0.00000');
+
             $("#DiscountPerUnit").val('');
+
+            $("#ItemsDiscount").val('0.00000');
+
             $("#DiscountPercentage").val('');
+
+            $("#DiscountAmount").val('0.00000');
         }
 
         $("form").submit(function ()
         {
+
+        if (invoiceLines.length === 0)
+        {
+            alert("Please add at least one invoice line.");
+            return false;
+        }
+
             let container = $("#HiddenLinesContainer");
 
             container.empty();
+
+
 
             invoiceLines.forEach((line, lineIndex) =>
             {
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemCode" value="${line.itemCode}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Description" value="${line.description}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Quantity" value="${line.quantity}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitType" value="${line.unitType}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitPrice" value="${line.unitPrice}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].SalesTotal" value="${line.salesTotal}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPerUnit" value="${line.discountPerUnit}" />`);
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPercentage" value="${line.discountPercentage}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitTypeId" value="${line.unitTypeId}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemsDiscount" value="${line.itemsDiscount}" />`);
+                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountAmount" value="${line.discountAmount}" />`);
 
-                line.taxes.forEach((tax, taxIndex) =>
-                {
-                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxType}" />`);
-                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].SubType" value="${tax.subType}" />`);
-                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
-                    container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);
+
+            line.taxes.forEach((tax, taxIndex) =>
+            {
+                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType"value="${tax.taxTypeId}" />`);
+
+                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType"value="${tax.taxSubTypeId}" />`);
+
+                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate"value="${tax.rate}" />`);
+
+                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount"value="${tax.amount}" />`);
+            });
                 });
             });
-        });
 
     </script>
 

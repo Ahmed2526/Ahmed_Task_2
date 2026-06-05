@@ -1,0 +1,31 @@
+﻿@model InvoiceTaxFormVM
+
+<div class="row mb-3">
+
+    <div class="col-md-3">
+        <label asp-for="TaxType" class="form-label">Tax Type</label>
+        <select asp-for="TaxType" asp-items="Model?.TaxTypesList" class="form-select">
+            <option value="">Select Tax Type</option>
+        </select>
+        <span asp-validation-for="TaxType" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="TaxSubType" class="form-label">Sub Type</label>
+        <select asp-for="TaxSubType" asp-items="Model?.TaxSubTypeList" class="form-select">
+            <option value="">Select Sub Type</option>
+        </select>
+        <span asp-validation-for="TaxSubType" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Rate" class="form-label">Rate</label>
+        <input asp-for="Rate" type="number" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Amount" class="form-label">Amount</label>
+        <input asp-for="Amount" type="number" class="form-control" />
+    </div>
+
+</div>

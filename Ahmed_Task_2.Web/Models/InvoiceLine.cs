@@ -1,4 +1,4 @@
-﻿using Ahmed_Task_2.Web.@enum;
+﻿using Ahmed_Task_2.Web.Enums;
 
 namespace Ahmed_Task_2.Web.Models
 {
