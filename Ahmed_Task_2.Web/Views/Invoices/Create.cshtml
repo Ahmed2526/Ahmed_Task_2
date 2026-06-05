@@ -653,16 +653,11 @@
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountAmount" value="${line.discountAmount}" />`);
 
 
-            line.taxes.forEach((tax, taxIndex) =>
-            {
-                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType"value="${tax.taxTypeId}" />`);
-
-                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType"value="${tax.taxSubTypeId}" />`);
-
-                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate"value="${tax.rate}" />`);
-
-                container.append(`<input type="hidden"name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount"value="${tax.amount}" />`);
-            });
+                    line.taxes.forEach((tax, taxIndex) => {
+            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
+            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
+            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
+            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);});
                 });
             });
 
