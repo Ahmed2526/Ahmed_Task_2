@@ -223,7 +223,7 @@
                     </tbody>
                 </table>
 
-           <button type="submit"
+                <button type="submit"
                         class="btn btn-primary my-5">
                     Save Invoice
                 </button>
@@ -318,6 +318,11 @@
 
         const lineModal = new bootstrap.Modal(document.getElementById('LineModal'));
 
+        let lineIndex = 0;
+
+        let invoiceLines = [];
+        let currentTaxes = [];
+
         function calcTotalDiscount() {
             let quantity = parseFloat($("#Quantity").val() || 0);
             let discountPerUnit = parseFloat($("#DiscountPerUnit").val() || 0);
@@ -368,9 +373,7 @@
                 parseFloat($("#DiscountAmount").val() || 0);
 
             let totalTaxableFees =
-                currentTaxes.reduce(
-                    (sum, tax) => sum + parseFloat(tax.amount || 0),
-                    0);
+                currentTaxes.reduce((sum, tax) => sum + parseFloat(tax.amount || 0),0);
 
             let netTotal =
                 salesTotal -
@@ -392,15 +395,9 @@
         }
 
 
-
         function showLineModal() {
           lineModal.show();
         }
-
-         let lineIndex = 0;
-
-        let invoiceLines = [];
-        let currentTaxes = [];
 
         function addTaxRow()
         {
@@ -637,8 +634,6 @@
 
             container.empty();
 
-
-
             invoiceLines.forEach((line, lineIndex) =>
             {
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemCode" value="${line.itemCode}" />`);
@@ -653,7 +648,7 @@
                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountAmount" value="${line.discountAmount}" />`);
 
 
-                    line.taxes.forEach((tax, taxIndex) => {
+            line.taxes.forEach((tax, taxIndex) => {
             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
