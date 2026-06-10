@@ -260,401 +260,420 @@
 
     <script>
 
-        $(function () {
+         $(function () {
 
-            $('#smartwizard').smartWizard({
+             $('#smartwizard').smartWizard({
 
-                selected: 0,
+                 selected: 0,
 
-                theme: 'arrows',
+                 theme: 'arrows',
 
-                autoAdjustHeight: true,
+                 autoAdjustHeight: true,
 
-                enableUrlHash: false,
+                 enableUrlHash: false,
 
-                keyboard: true,
+                 keyboard: true,
 
-                transition: {
-                    animation: 'slideHorizontal'
+                 transition: {
+                     animation: 'slideHorizontal'
+                 }
+
+             });
+
+         });
+
+         $('#smartwizard').on(
+         "leaveStep",
+         function(e, anchorObject, currentStepIndex, nextStepIndex, stepDirection)
+         {
+         if(stepDirection === 'forward')
+         {
+         return validateCurrentStep(currentStepIndex);
+         }
+
+         return true;
+         });
+
+         function validateCurrentStep(step)
+         {
+             let valid = true;
+
+             let currentTab =
+                 $('#step-' + (step + 1));
+
+             currentTab
+                 .find('input, textarea, select')
+                 .each(function ()
+                 {
+                     $(this).valid();
+
+                     if (!$(this).valid())
+                     {
+                         valid = false;
+                     }
+                 });
+
+             return valid;
+         }
+
+         const lineModal = new bootstrap.Modal(document.getElementById('LineModal'));
+
+         let lineIndex = 0;
+
+         let invoiceLines = [];
+         let currentTaxes = [];
+
+         function calcTotalDiscount() {
+             let quantity = parseFloat($("#Quantity").val() || 0);
+             let discountPerUnit = parseFloat($("#DiscountPerUnit").val() || 0);
+
+             let totalDiscount = quantity * discountPerUnit;
+
+             $("#ItemsDiscount").val(totalDiscount.toFixed(5));
+
+             updateTotals();
+         }
+
+         function calcSalesTotal() {
+             let quantity = parseFloat($("#Quantity").val() || 0);
+             let unitPrice = parseFloat($("#UnitPrice").val() || 0);
+
+             let salesTotal = quantity * unitPrice;
+
+             $("#SalesTotal").val(salesTotal.toFixed(5));
+
+             updateTotals();
+         }
+
+         function calcDiscountAmount() {
+
+             let quantity = parseFloat($("#Quantity").val() || 0);
+             let unitPrice = parseFloat($("#UnitPrice").val() || 0);
+             let discountRate = parseFloat($("#DiscountPercentage").val() || 0);
+
+             let salesTotal = quantity * unitPrice;
+
+             let discountAmount =
+                 salesTotal * (discountRate / 100);
+
+             $("#DiscountAmount").val(discountAmount.toFixed(5));
+
+             updateTotals();
+         }
+
+        function CalcTaxes() {
+
+            let netTotal = parseFloat($("#NetTotal").val()) || 0;
+
+            $.ajax({
+                url: '/Invoices/CalculateTaxes',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(
+                    currentTaxes.map(tax => ({
+                        taxType: tax.taxTypeId,
+                        taxSubType: tax.taxSubTypeId,
+                        rate: tax.rate,
+                        amount: tax.amount,
+                        netTotal: netTotal
+                    }))
+                ),
+                success: function (result) {
+
+                    let totalTaxes = parseFloat(result) || 0;
+
+                    $("#TotalTaxableFees")
+                        .val(totalTaxes.toFixed(5));
+
+                    let total =
+                        netTotal +
+                        totalTaxes;
+
+                    $("#Total")
+                        .val(total.toFixed(5));
                 }
-
             });
-
-        });
-
-        $('#smartwizard').on(
-        "leaveStep",
-        function(e, anchorObject, currentStepIndex, nextStepIndex, stepDirection)
-        {
-        if(stepDirection === 'forward')
-        {
-        return validateCurrentStep(currentStepIndex);
-        }
-
-        return true;
-        });
-
-        function validateCurrentStep(step)
-        {
-            let valid = true;
-
-            let currentTab =
-                $('#step-' + (step + 1));
-
-            currentTab
-                .find('input, textarea, select')
-                .each(function ()
-                {
-                    $(this).valid();
-
-                    if (!$(this).valid())
-                    {
-                        valid = false;
-                    }
-                });
-
-            return valid;
-        }
-
-        const lineModal = new bootstrap.Modal(document.getElementById('LineModal'));
-
-        let lineIndex = 0;
-
-        let invoiceLines = [];
-        let currentTaxes = [];
-
-        function calcTotalDiscount() {
-            let quantity = parseFloat($("#Quantity").val() || 0);
-            let discountPerUnit = parseFloat($("#DiscountPerUnit").val() || 0);
-
-            let totalDiscount = quantity * discountPerUnit;
-
-            $("#ItemsDiscount").val(totalDiscount.toFixed(5));
-
-            updateTotals();
-        }
-
-        function calcSalesTotal() {
-            let quantity = parseFloat($("#Quantity").val() || 0);
-            let unitPrice = parseFloat($("#UnitPrice").val() || 0);
-
-            let salesTotal = quantity * unitPrice;
-
-            $("#SalesTotal").val(salesTotal.toFixed(5));
-
-            updateTotals();
-        }
-
-        function calcDiscountAmount() {
-
-            let quantity = parseFloat($("#Quantity").val() || 0);
-            let unitPrice = parseFloat($("#UnitPrice").val() || 0);
-            let discountRate = parseFloat($("#DiscountPercentage").val() || 0);
-
-            let salesTotal = quantity * unitPrice;
-
-            let discountAmount =
-                salesTotal * (discountRate / 100);
-
-            $("#DiscountAmount").val(discountAmount.toFixed(5));
-
-            updateTotals();
         }
 
         function updateTotals()
         {
-            let salesTotal =
-                parseFloat($("#SalesTotal").val() || 0);
+            let salesTotal =parseFloat($("#SalesTotal").val()) || 0;
 
-            let itemsDiscount =
-                parseFloat($("#ItemsDiscount").val() || 0);
+            let itemsDiscount =parseFloat($("#ItemsDiscount").val()) || 0;
 
-            let discountAmount =
-                parseFloat($("#DiscountAmount").val() || 0);
-
-            let totalTaxableFees =
-                currentTaxes.reduce((sum, tax) => sum + parseFloat(tax.amount || 0),0);
+            let discountAmount =parseFloat($("#DiscountAmount").val()) || 0;
 
             let netTotal =
                 salesTotal -
                 itemsDiscount -
                 discountAmount;
 
-            let total =
-                netTotal +
-                totalTaxableFees;
+            $("#NetTotal").val(netTotal.toFixed(5));
 
-            $("#TotalTaxableFees")
-                .val(totalTaxableFees.toFixed(5));
-
-            $("#NetTotal")
-                .val(netTotal.toFixed(5));
-
-            $("#Total")
-                .val(total.toFixed(5));
+            CalcTaxes();
         }
 
 
-        function showLineModal() {
-          lineModal.show();
-        }
+         function showLineModal() {
+           lineModal.show();
+         }
 
-        function addTaxRow()
-        {
-            let taxType = $("#TaxType").val();
-            let taxSubType = $("#TaxSubType").val();
-            let rate = $("#Rate").val();
-            let amount = $("#Amount").val();
+         function addTaxRow()
+         {
+             let taxType = $("#TaxType").val();
+             let taxSubType = $("#TaxSubType").val();
+             let rate = $("#Rate").val();
+             let amount = $("#Amount").val();
 
-            if (taxType)
-            {
-                if (!taxSubType)
-                {
-                    alert("Please select a Tax Sub Type.");
-                    return;
-                }
+             if (taxType)
+             {
+                 if (!taxSubType)
+                 {
+                     alert("Please select a Tax Sub Type.");
+                     return;
+                 }
 
-                if (!amount)
-                {
-                    alert("Please enter the Tax Amount.");
-                    return;
-                }
+                 if (!amount)
+                 {
+                     alert("Please enter the Tax Amount.");
+                     return;
+                 }
 
-                if (!rate)
-                {
-                    alert("Please enter the Tax Rate.");
-                    return;
-                }
-            }
+                 if (!rate)
+                 {
+                     alert("Please enter the Tax Rate.");
+                     return;
+                 }
+             }
 
-            let tax =
-            {
-                taxTypeId: taxType,
-                taxTypeName: $("#TaxType option:selected").text(),
+             let tax =
+             {
+                 taxTypeId: taxType,
+                 taxTypeName: $("#TaxType option:selected").text(),
 
-                taxSubTypeId: taxSubType,
-                taxSubTypeName: $("#TaxSubType option:selected").text(),
+                 taxSubTypeId: taxSubType,
+                 taxSubTypeName: $("#TaxSubType option:selected").text(),
 
-                rate: rate,
-                amount: amount
-            };
+                 rate: rate,
+                 amount: amount
+             };
 
-            currentTaxes.push(tax);
+             currentTaxes.push(tax);
 
-            renderTaxTable();
+             renderTaxTable();
 
-            $("#TaxType").val('');
-            $("#TaxSubType").val('');
-            $("#Rate").val('');
-            $("#Amount").val('');
+             $("#TaxType").val('');
+             $("#TaxSubType").val('');
+             $("#Rate").val('');
+             $("#Amount").val('');
 
-            updateTotals();
-        }
+             updateTotals();
+         }
 
-        function renderTaxTable()
-        {
-            let body = $("#taxTableBody");
+         function renderTaxTable()
+         {
+             let body = $("#taxTableBody");
 
-            body.empty();
+             body.empty();
 
-            currentTaxes.forEach((tax, index) =>
-            {
-                body.append(`
-                    <tr>
-                        <td>${tax.taxTypeName}</td>
-                        <td>${tax.taxSubTypeName}</td>
-                        <td>${tax.rate}</td>
-                        <td>${tax.amount}</td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="removeTax(${index})">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
+             currentTaxes.forEach((tax, index) =>
+             {
+                 body.append(`
+                     <tr>
+                         <td>${tax.taxTypeName}</td>
+                         <td>${tax.taxSubTypeName}</td>
+                         <td>${tax.rate}</td>
+                         <td>${tax.amount}</td>
+                         <td>
+                             <button type="button"
+                                     class="btn btn-danger btn-sm"
+                                     onclick="removeTax(${index})">
+                                 Delete
+                             </button>
+                         </td>
+                     </tr>
+                 `);
+             });
+         }
 
-        function removeTax(index)
-        {
-            currentTaxes.splice(index, 1);
+         function removeTax(index)
+         {
+             currentTaxes.splice(index, 1);
 
-            renderTaxTable();
-            updateTotals();
-        }
+             renderTaxTable();
+             updateTotals();
+         }
 
-        function addLine()
-        {
-        let valid = true;
+         function addLine()
+         {
+         let valid = true;
 
-        $("#LineModal")
-            .find("input, textarea, select")
-            .each(function ()
-            {
-                if ($(this).data("val") !== undefined)
-                {
-                    $(this).valid();
+         $("#LineModal")
+             .find("input, textarea, select")
+             .each(function ()
+             {
+                 if ($(this).data("val") !== undefined)
+                 {
+                     $(this).valid();
 
-                    if (!$(this).valid())
-                    {
-                        valid = false;
-                    }
-                }
-            });
+                     if (!$(this).valid())
+                     {
+                         valid = false;
+                     }
+                 }
+             });
 
-        if (!valid)
-        {
-            return;
-        }
+         if (!valid)
+         {
+             return;
+         }
 
-                let totalTax =
-            currentTaxes.reduce(
-                (sum, tax) => sum + parseFloat(tax.amount || 0),
-                0);
+                 let totalTax =
+             currentTaxes.reduce(
+                 (sum, tax) => sum + parseFloat(tax.amount || 0),
+                 0);
 
-        let netTotal =
-            parseFloat($("#SalesTotal").val() || 0)
-            - parseFloat($("#ItemsDiscount").val() || 0)
-            - parseFloat($("#DiscountAmount").val() || 0);
+         let netTotal =
+             parseFloat($("#SalesTotal").val() || 0)
+             - parseFloat($("#ItemsDiscount").val() || 0)
+             - parseFloat($("#DiscountAmount").val() || 0);
 
-        let total =
-            netTotal + totalTax;
+         let total =
+             netTotal + totalTax;
 
-        let line =
-        {
-            itemCode: $("#ItemCode").val(),
-            description: $("#Description").val(),
+         let line =
+         {
+             itemCode: $("#ItemCode").val(),
+             description: $("#Description").val(),
 
-            quantity: $("#Quantity").val(),
+             quantity: $("#Quantity").val(),
 
-            unitTypeId: $("#UnitTypeId").val(),
-            unitType: $("#UnitTypeId option:selected").text(),
+             unitTypeId: $("#UnitTypeId").val(),
+             unitType: $("#UnitTypeId option:selected").text(),
 
-            unitPrice: $("#UnitPrice").val(),
+             unitPrice: $("#UnitPrice").val(),
 
-            salesTotal: $("#SalesTotal").val(),
+             salesTotal: $("#SalesTotal").val(),
 
-            discountPerUnit: $("#DiscountPerUnit").val(),
+             discountPerUnit: $("#DiscountPerUnit").val(),
 
-            itemsDiscount: $("#ItemsDiscount").val(),
+             itemsDiscount: $("#ItemsDiscount").val(),
 
-            discountPercentage: $("#DiscountPercentage").val(),
+             discountPercentage: $("#DiscountPercentage").val(),
 
-            discountAmount: $("#DiscountAmount").val(),
+             discountAmount: $("#DiscountAmount").val(),
 
-            totalTaxableFees: totalTax,
-            total: total,
+             totalTaxableFees: totalTax,
+             total: total,
 
-            taxes: [...currentTaxes]
-        };
+             taxes: [...currentTaxes]
+         };
 
-            invoiceLines.push(line);
+             invoiceLines.push(line);
 
-            currentTaxes = [];
+             currentTaxes = [];
 
-            renderTaxTable();
-            renderLinesTable();
+             renderTaxTable();
+             renderLinesTable();
 
-            clearLineForm();
+             clearLineForm();
 
-            lineModal.hide();
-        }
+             lineModal.hide();
+         }
 
-        function renderLinesTable()
-        {
-            let body = $("#invoiceLinesBody");
+         function renderLinesTable()
+         {
+             let body = $("#invoiceLinesBody");
 
-            body.empty();
+             body.empty();
 
-            invoiceLines.forEach((line, index) =>
-            {
-                body.append(`
-                    <tr>
-                        <td>${line.itemCode}</td>
-                        <td>${line.unitType}</td>
-                        <td>${line.quantity}</td>
-                        <td>${line.unitPrice}</td>
-                        <td>${line.salesTotal}</td>
-                        <td>${line.itemsDiscount}</td>
-                        <td>${line.discountAmount}</td>
-                        <td>${parseFloat(line.total).toFixed(5)}</td>
-                        <td>
-                            <button type="button"
-                                    class="btn btn-danger btn-sm"
-                                    onclick="removeLine(${index})">
-                                Delete
-                            </button>
-                        </td>
-                    </tr>
-                `);
-            });
-        }
+             invoiceLines.forEach((line, index) =>
+             {
+                 body.append(`
+                     <tr>
+                         <td>${line.itemCode}</td>
+                         <td>${line.unitType}</td>
+                         <td>${line.quantity}</td>
+                         <td>${line.unitPrice}</td>
+                         <td>${line.salesTotal}</td>
+                         <td>${line.itemsDiscount}</td>
+                         <td>${line.discountAmount}</td>
+                         <td>${parseFloat(line.total).toFixed(5)}</td>
+                         <td>
+                             <button type="button"
+                                     class="btn btn-danger btn-sm"
+                                     onclick="removeLine(${index})">
+                                 Delete
+                             </button>
+                         </td>
+                     </tr>
+                 `);
+             });
+         }
 
-        function removeLine(index)
-        {
-            invoiceLines.splice(index, 1);
+         function removeLine(index)
+         {
+             invoiceLines.splice(index, 1);
 
-            renderLinesTable();
-        }
+             renderLinesTable();
+         }
 
-        function clearLineForm()
-        {
-            $("#ItemCode").val('');
-            $("#Description").val('');
+         function clearLineForm()
+         {
+             $("#ItemCode").val('');
+             $("#Description").val('');
 
-            $("#Quantity").val('');
+             $("#Quantity").val('');
 
-            $("#UnitTypeId").val('');
+             $("#UnitTypeId").val('');
 
-            $("#UnitPrice").val('');
+             $("#UnitPrice").val('');
 
-            $("#SalesTotal").val('0.00000');
+             $("#SalesTotal").val('0.00000');
 
-            $("#DiscountPerUnit").val('');
+             $("#DiscountPerUnit").val('');
 
-            $("#ItemsDiscount").val('0.00000');
+             $("#ItemsDiscount").val('0.00000');
 
-            $("#DiscountPercentage").val('');
+             $("#DiscountPercentage").val('');
 
-            $("#DiscountAmount").val('0.00000');
-        }
+             $("#DiscountAmount").val('0.00000');
+         }
 
-        $("form").submit(function ()
-        {
+         $("form").submit(function ()
+         {
 
-        if (invoiceLines.length === 0)
-        {
-            alert("Please add at least one invoice line.");
-            return false;
-        }
+         if (invoiceLines.length === 0)
+         {
+             alert("Please add at least one invoice line.");
+             return false;
+         }
 
-            let container = $("#HiddenLinesContainer");
+             let container = $("#HiddenLinesContainer");
 
-            container.empty();
+             container.empty();
 
-            invoiceLines.forEach((line, lineIndex) =>
-            {
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemCode" value="${line.itemCode}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].Description" value="${line.description}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].Quantity" value="${line.quantity}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitPrice" value="${line.unitPrice}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].SalesTotal" value="${line.salesTotal}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPerUnit" value="${line.discountPerUnit}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPercentage" value="${line.discountPercentage}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitTypeId" value="${line.unitTypeId}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemsDiscount" value="${line.itemsDiscount}" />`);
-                container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountAmount" value="${line.discountAmount}" />`);
+             invoiceLines.forEach((line, lineIndex) =>
+             {
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemCode" value="${line.itemCode}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Description" value="${line.description}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Quantity" value="${line.quantity}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitPrice" value="${line.unitPrice}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].SalesTotal" value="${line.salesTotal}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPerUnit" value="${line.discountPerUnit}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountPercentage" value="${line.discountPercentage}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].UnitTypeId" value="${line.unitTypeId}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].ItemsDiscount" value="${line.itemsDiscount}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].DiscountAmount" value="${line.discountAmount}" />`);
 
 
-            line.taxes.forEach((tax, taxIndex) => {
-            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
-            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
-            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
-            container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);});
-                });
-            });
+             line.taxes.forEach((tax, taxIndex) => {
+             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
+             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
+             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
+             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);});
+                 });
+             });
 
     </script>
 

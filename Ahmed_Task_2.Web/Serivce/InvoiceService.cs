@@ -84,6 +84,24 @@ namespace Ahmed_Task_2.Web.Serivce
                     NetTotal = CalculateNetTotal(line),
                 };
 
+                //T2,T3 ,T5:T12
+                decimal TaxFromT5ToT12 = 0;
+                decimal TaxT2 = 0;
+                decimal TaxT3 = 0;
+
+                foreach (var tax in line?.Taxes ?? Enumerable.Empty<InvoiceTaxRequest>())
+                {
+                    if (tax.TaxType == 3)
+                        TaxT3 += tax.Amount;
+
+                    if (tax.TaxType == 5 || tax.TaxType == 6 || tax.TaxType == 7 || tax.TaxType == 8 || tax.TaxType == 9 || tax.TaxType == 10 || tax.TaxType == 11 || tax.TaxType == 12)
+                    {
+                        TaxFromT5ToT12 += tax.Amount;
+                    }
+                }
+
+                line?.Taxes = line?.Taxes?.OrderByDescending(x => x.TaxType).ToList();
+
                 foreach (var tax in line?.Taxes ?? Enumerable.Empty<InvoiceTaxRequest>())
                 {
                     if (!await _context.TaxTypes.AnyAsync(x => x.Id == tax.TaxType))
@@ -92,7 +110,53 @@ namespace Ahmed_Task_2.Web.Serivce
                     if (!await _context.TaxSubTypes.AnyAsync(x => x.Id == tax.TaxSubType))
                         return Result<bool>.Fail(400, new[] { "Invalid TaxSubType." });
 
-                    var invoiceTax = new InvoiceTax
+                    decimal NetSale = 0;
+                    decimal T2 = 0;
+
+                    // T1 - Value added tax
+                    if (tax.TaxType == 1)
+                    {
+                        NetSale = invoiceLine.NetTotal;
+                        var T1 = (NetSale + TaxFromT5ToT12 + TaxT2 + TaxT3) * tax.Rate / 100;
+
+                        var invoiceTax = new InvoiceTax
+                        {
+                            TaxTypeId = tax.TaxType,
+                            TaxSubTypeId = tax.TaxSubType,
+                            Amount = 0,
+                            Rate = tax.Rate,
+                        };
+
+                        invoiceLine.TotalTaxableFees += T1;
+                        invoiceLine.Taxes.Add(invoiceTax);
+
+                        continue;
+                    }
+
+                    // T2 - Table tax
+                    if (tax.TaxType == 2)
+                    {
+                        NetSale = invoiceLine.NetTotal;
+                        T2 = (NetSale + TaxFromT5ToT12) * tax.Rate / 100;
+
+                        var invoiceTax = new InvoiceTax
+                        {
+                            TaxTypeId = tax.TaxType,
+                            TaxSubTypeId = tax.TaxSubType,
+                            Amount = 0,
+                            Rate = tax.Rate,
+                        };
+
+                        invoiceLine.TotalTaxableFees += T2;
+                        invoiceLine.Taxes.Add(invoiceTax);
+
+                        TaxT2 = T2;
+
+                        continue;
+                    }
+
+                    //other taxes
+                    var invoiceTaxx = new InvoiceTax
                     {
                         TaxTypeId = tax.TaxType,
                         TaxSubTypeId = tax.TaxSubType,
@@ -102,7 +166,7 @@ namespace Ahmed_Task_2.Web.Serivce
 
                     invoiceLine.TotalTaxableFees += tax.Amount;
 
-                    invoiceLine.Taxes.Add(invoiceTax);
+                    invoiceLine.Taxes.Add(invoiceTaxx);
                 }
 
                 invoiceLine.Total = invoiceLine.NetTotal + invoiceLine.TotalTaxableFees;
@@ -184,6 +248,26 @@ namespace Ahmed_Task_2.Web.Serivce
                     NetTotal = CalculateNetTotalMVC(line),
                 };
 
+
+                //T2,T3 ,T5:T12
+                decimal TaxFromT5ToT12 = 0;
+                decimal TaxT2 = 0;
+                decimal TaxT3 = 0;
+
+                foreach (var tax in line?.Taxes)
+                {
+                    if (tax.TaxType == 3)
+                        TaxT3 += (decimal)tax.Amount;
+
+                    if (tax.TaxType == 5 || tax.TaxType == 6 || tax.TaxType == 7 || tax.TaxType == 8 || tax.TaxType == 9 || tax.TaxType == 10 || tax.TaxType == 11 || tax.TaxType == 12)
+                    {
+                        TaxFromT5ToT12 += (decimal)tax.Amount;
+                    }
+                }
+
+                line?.Taxes = line?.Taxes?.OrderByDescending(x => x.TaxType).ToList();
+
+
                 foreach (var tax in line?.Taxes!)
                 {
                     if (!await _context.TaxTypes.AnyAsync(x => x.Id == tax.TaxType))
@@ -192,17 +276,64 @@ namespace Ahmed_Task_2.Web.Serivce
                     if (!await _context.TaxSubTypes.AnyAsync(x => x.Id == tax.TaxSubType))
                         return Result<string>.Fail(400, new[] { "Invalid TaxSubType." });
 
-                    var invoiceTax = new InvoiceTax
+
+                    decimal NetSale = 0;
+                    decimal T2 = 0;
+
+                    // T1 - Value added tax
+                    if (tax.TaxType == 1)
                     {
-                        TaxTypeId = (int)tax.TaxType!,
-                        TaxSubTypeId = (int)tax.TaxSubType!,
-                        Amount = (decimal)tax.Amount!,
-                        Rate = (decimal)tax.Rate!,
+                        NetSale = invoiceLine.NetTotal;
+                        var T1 = (NetSale + TaxFromT5ToT12 + TaxT2 + TaxT3) * tax.Rate / 100;
+
+                        var invoiceTax = new InvoiceTax
+                        {
+                            TaxTypeId = (int)tax.TaxType,
+                            TaxSubTypeId = (int)tax.TaxSubType,
+                            Amount = 0,
+                            Rate = (decimal)tax.Rate,
+                        };
+
+                        invoiceLine.TotalTaxableFees += (decimal)T1;
+                        invoiceLine.Taxes.Add(invoiceTax);
+
+                        continue;
+                    }
+
+                    // T2 - Table tax
+                    if (tax.TaxType == 2)
+                    {
+                        NetSale = invoiceLine.NetTotal;
+                        T2 = (NetSale + TaxFromT5ToT12) * (decimal)tax.Rate / 100;
+
+                        var invoiceTax = new InvoiceTax
+                        {
+                            TaxTypeId = (int)tax.TaxType,
+                            TaxSubTypeId = (int)tax.TaxSubType,
+                            Amount = 0,
+                            Rate = (decimal)tax.Rate,
+                        };
+
+                        invoiceLine.TotalTaxableFees += (decimal)T2;
+                        invoiceLine.Taxes.Add(invoiceTax);
+
+                        TaxT2 = T2;
+
+                        continue;
+                    }
+
+                    //other taxes
+                    var invoiceTaxx = new InvoiceTax
+                    {
+                        TaxTypeId = (int)tax.TaxType,
+                        TaxSubTypeId = (int)tax.TaxSubType,
+                        Amount = (decimal)tax.Amount,
+                        Rate = (decimal)tax.Rate,
                     };
 
                     invoiceLine.TotalTaxableFees += (decimal)tax.Amount;
 
-                    invoiceLine.Taxes.Add(invoiceTax);
+                    invoiceLine.Taxes.Add(invoiceTaxx);
                 }
 
                 invoiceLine.Total = invoiceLine.NetTotal + invoiceLine.TotalTaxableFees;
