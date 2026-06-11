@@ -527,10 +527,7 @@
              return;
          }
 
-                 let totalTax =
-             currentTaxes.reduce(
-                 (sum, tax) => sum + parseFloat(tax.amount || 0),
-                 0);
+         let totalTax =parseFloat($("#TotalTaxableFees").val() || 0);
 
          let netTotal =
              parseFloat($("#SalesTotal").val() || 0)
