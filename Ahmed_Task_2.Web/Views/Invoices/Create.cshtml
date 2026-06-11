@@ -420,31 +420,30 @@
 
          function addTaxRow()
          {
-             let taxType = $("#TaxType").val();
-             let taxSubType = $("#TaxSubType").val();
-             let rate = $("#Rate").val();
-             let amount = $("#Amount").val();
+                let taxType = $("#TaxType").val();
+                let taxSubType = $("#TaxSubType").val();
+                let rate = $("#Rate").val();
+                let amount = $("#Amount").val();
 
-             if (taxType)
-             {
-                 if (!taxSubType)
-                 {
-                     alert("Please select a Tax Sub Type.");
-                     return;
-                 }
+                if (!taxType) {
+                    alert("Please select a Tax Type.");
+                    return;
+                }
 
-                 if (!amount)
-                 {
-                     alert("Please enter the Tax Amount.");
-                     return;
-                 }
+                if (!taxSubType) {
+                    alert("Please select a Tax Sub Type.");
+                    return;
+                }
 
-                 if (!rate)
-                 {
-                     alert("Please enter the Tax Rate.");
-                     return;
-                 }
-             }
+                if (!rate) {
+                    alert("Please enter the Tax Rate.");
+                    return;
+                }
+
+                if (!amount) {
+                    alert("Please enter the Tax Amount.");
+                    return;
+                }
 
              let tax =
              {
@@ -629,15 +628,21 @@
 
              $("#UnitPrice").val('');
 
-             $("#SalesTotal").val('0.00000');
+             $("#SalesTotal").val('');
 
              $("#DiscountPerUnit").val('');
 
-             $("#ItemsDiscount").val('0.00000');
+             $("#ItemsDiscount").val('');
 
              $("#DiscountPercentage").val('');
 
-             $("#DiscountAmount").val('0.00000');
+             $("#DiscountAmount").val('');
+
+             $("#NetTotal").val('');
+
+             $("#Total").val('');
+
+             $("#TotalTaxableFees").val('');
          }
 
          $("form").submit(function ()
@@ -668,10 +673,10 @@
 
 
              line.taxes.forEach((tax, taxIndex) => {
-             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
-             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
-             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
-             container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);});
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxType" value="${tax.taxTypeId}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].TaxSubType" value="${tax.taxSubTypeId}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Rate" value="${tax.rate}" />`);
+                 container.append(`<input type="hidden" name="Lines[${lineIndex}].Taxes[${taxIndex}].Amount" value="${tax.amount}" />`);});
                  });
              });
 

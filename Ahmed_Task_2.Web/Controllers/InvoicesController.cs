@@ -162,5 +162,6 @@ namespace Ahmed_Task_2.Web.Controllers
 
             return Ok(TotalTaxes);
         }
+
     }
 }
